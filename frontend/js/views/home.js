@@ -1,12 +1,19 @@
 import { t } from "../i18n.js";
-import { getCharts, saveChart, deleteChart, generateId } from "../store.js";
+import { getCharts, getSettings, saveChart, deleteChart, generateId } from "../store.js";
 import { computeChart } from "../api.js";
 import { initPlaceSearch } from "../components/place-search.js";
 import { SIGN_GLYPHS, formatDegree } from "../lib/astro-utils.js";
 
 let selectedPlace = null;
 
-export function renderHome(container) {
+async function getConfigKey() {
+  try {
+    const mod = await import("../config.js");
+    return mod.CONFIG?.GEMINI_API_KEY || "";
+  } catch { return ""; }
+}
+
+export async function renderHome(container) {
   const charts = getCharts();
   const ids = Object.keys(charts).sort((a, b) => {
     const ta = charts[b]._savedAt || "";
@@ -14,7 +21,22 @@ export function renderHome(container) {
     return ta.localeCompare(tb);
   });
 
+  const hasKey = !!(getSettings().gemini_api_key || await getConfigKey());
+
   container.innerHTML = `
+    ${!hasKey ? `
+    <div class="ai-setup-guide card">
+      <div class="ai-setup-icon">✨</div>
+      <h3>${t("home.ai_guide_title")}</h3>
+      <p>${t("home.ai_guide_desc")}</p>
+      <ol class="ai-setup-steps">
+        <li>${t("home.ai_step1")}</li>
+        <li>${t("home.ai_step2")}</li>
+        <li>${t("home.ai_step3")}</li>
+      </ol>
+      <a href="#/settings" class="btn btn-primary">${t("home.ai_go_settings")}</a>
+    </div>
+    ` : ""}
     <div class="section-header">
       <h2>${t("home.title")}</h2>
       <button class="btn btn-primary" id="btn-new">${t("home.new")}</button>
