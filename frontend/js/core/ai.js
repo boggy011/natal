@@ -5,19 +5,13 @@
 
 import { getSettings } from "../store.js";
 
-let CONFIG = { GEMINI_API_KEY: "" };
-try {
-  const mod = await import("../config.js");
-  CONFIG = mod.CONFIG || CONFIG;
-} catch (_) { /* config.js not present (e.g. GitHub Pages) — use Settings key */ }
-
 const SYSTEM = `You are a warm, insightful astrologer who gives practical, grounded interpretations.
 Speak directly to the person using "you". Use vivid language. Balance cosmic symbolism with real-life advice.
 Keep readings around 3-4 paragraphs. Cover emotional, practical, and action-oriented aspects.
 Never use scary or fatalistic language. Be empowering.`;
 
 function getApiKey() {
-  return getSettings().gemini_api_key || CONFIG.GEMINI_API_KEY || "";
+  return getSettings().gemini_api_key || window.__NATAL_API_KEY || "";
 }
 
 function geminiUrl(key) {

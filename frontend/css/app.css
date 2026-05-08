@@ -627,6 +627,27 @@ body {
   text-decoration: underline;
 }
 
+.ai-setup-input {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.ai-setup-input input {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.ai-setup-input input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Disclaimer */
 .disclaimer {
   margin-top: 3rem;

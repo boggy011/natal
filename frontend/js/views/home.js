@@ -1,19 +1,12 @@
 import { t } from "../i18n.js";
-import { getCharts, getSettings, saveChart, deleteChart, generateId } from "../store.js";
+import { getCharts, getSettings, saveSetting, saveChart, deleteChart, generateId } from "../store.js";
 import { computeChart } from "../api.js";
 import { initPlaceSearch } from "../components/place-search.js";
 import { SIGN_GLYPHS, formatDegree } from "../lib/astro-utils.js";
 
 let selectedPlace = null;
 
-async function getConfigKey() {
-  try {
-    const mod = await import("../config.js");
-    return mod.CONFIG?.GEMINI_API_KEY || "";
-  } catch { return ""; }
-}
-
-export async function renderHome(container) {
+export function renderHome(container) {
   const charts = getCharts();
   const ids = Object.keys(charts).sort((a, b) => {
     const ta = charts[b]._savedAt || "";
@@ -21,7 +14,7 @@ export async function renderHome(container) {
     return ta.localeCompare(tb);
   });
 
-  const hasKey = !!(getSettings().gemini_api_key || await getConfigKey());
+  const hasKey = !!(getSettings().gemini_api_key || window.__NATAL_API_KEY);
 
   container.innerHTML = `
     ${!hasKey ? `
@@ -32,9 +25,12 @@ export async function renderHome(container) {
       <ol class="ai-setup-steps">
         <li>${t("home.ai_step1")}</li>
         <li>${t("home.ai_step2")}</li>
-        <li>${t("home.ai_step3")}</li>
       </ol>
-      <a href="#/settings" class="btn btn-primary">${t("home.ai_go_settings")}</a>
+      <div class="ai-setup-input">
+        <input type="password" id="home-gemini-key" placeholder="${t("settings.ai_key")}" style="flex:1">
+        <button class="btn btn-primary" id="btn-save-home-key">${t("settings.ai_save")}</button>
+      </div>
+      <span id="home-key-status" style="font-size:0.82rem;color:var(--teal);margin-top:0.4rem;display:block"></span>
     </div>
     ` : ""}
     <div class="section-header">
@@ -102,6 +98,16 @@ export async function renderHome(container) {
         document.getElementById("place-info").textContent =
           `${result.latitude.toFixed(4)}°N, ${result.longitude.toFixed(4)}°E — ${result.timezone}`;
       });
+    }
+  });
+
+  document.getElementById("btn-save-home-key")?.addEventListener("click", () => {
+    const key = document.getElementById("home-gemini-key").value.trim();
+    if (key) {
+      saveSetting("gemini_api_key", key);
+      const status = document.getElementById("home-key-status");
+      status.textContent = "Saved! AI readings are now active.";
+      setTimeout(() => { renderHome(container); }, 1500);
     }
   });
 
