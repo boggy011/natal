@@ -4,7 +4,12 @@
  */
 
 import { getSettings } from "../store.js";
-import { CONFIG } from "../config.js";
+
+let CONFIG = { GEMINI_API_KEY: "" };
+try {
+  const mod = await import("../config.js");
+  CONFIG = mod.CONFIG || CONFIG;
+} catch (_) { /* config.js not present (e.g. GitHub Pages) — use Settings key */ }
 
 const SYSTEM = `You are a warm, insightful astrologer who gives practical, grounded interpretations.
 Speak directly to the person using "you". Use vivid language. Balance cosmic symbolism with real-life advice.
