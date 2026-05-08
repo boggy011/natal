@@ -169,7 +169,7 @@ async function loadAIDeep(chart, topic) {
     }
   } finally {
     btn.disabled = false;
-    btn.textContent = "${t("chart.ai_btn")}";
+    btn.textContent = t("chart.ai_btn");
   }
 }
 
