@@ -1,6 +1,8 @@
 """FastAPI application entry point — mounts API routes and serves static frontend."""
 
 import time
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import structlog
@@ -23,11 +25,20 @@ structlog.configure(
 )
 logger = structlog.get_logger()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    init_db()
+    logger.info("app_started", env=settings.app_env)
+    yield
+
+
 app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -56,12 +67,6 @@ app.include_router(profiles.router, prefix="/api", tags=["profiles"])
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "ephemeris": "loaded"}
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    init_db()
-    logger.info("app_started", env=settings.app_env)
 
 
 frontend_path = Path(__file__).parent.parent / "frontend"
