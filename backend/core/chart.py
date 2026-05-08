@@ -4,9 +4,13 @@ from datetime import datetime
 
 import pytz
 
+import logging
+
 from backend.core.constants import ASPECTS
-from backend.core.ephemeris import Ephemeris
+from backend.core.ephemeris import Ephemeris, EphemerisError
 from backend.core.helpers import angular_distance, find_house, longitude_to_sign
+
+logger = logging.getLogger(__name__)
 from backend.core.models import (
     AspectHit,
     BirthData,
@@ -39,7 +43,12 @@ class NatalChartCalculator:
         if config.include_lilith and "Lilith" not in planet_names:
             planet_names.append("Lilith")
 
-        planets = [self._planet_position(jd, name, houses) for name in planet_names]
+        planets: list[PlanetPosition] = []
+        for name in planet_names:
+            try:
+                planets.append(self._planet_position(jd, name, houses))
+            except EphemerisError:
+                logger.warning("Skipping %s: ephemeris data not available", name)
         aspects = self._find_aspects(planets, config)
         obliquity = self.eph.obliquity(jd)
 
