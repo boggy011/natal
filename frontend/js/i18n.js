@@ -84,6 +84,8 @@ const DICT = {
     "chart.tab.love": "Love & Relationships",
     "chart.tab.work": "Work & Money",
     "chart.tab.health": "Health & Vitality",
+    "disclaimer.title": "Cosmic Disclaimer (Please Read Before Blaming the Stars)",
+    "disclaimer.body": "This is an <strong>experimental hobby project</strong> for entertainment purposes only. The planets don't care about your stock portfolio, your ex, or your Tuesday meeting.<br><br>Do NOT: sell your house because Jupiter said so, divorce your spouse over a Saturn transit, quit your job because Mercury is retrograde (again), self-diagnose based on your 6th house, or make any life-altering decisions based on what a website told you.<br><br>Do NOT hurt yourself, others, your pets, your plants, or your credit score based on anything you read here. If you're going through a tough time, talk to a real human — not a transit table.<br><br><strong>Astrology is fun. Real life needs real advice.</strong> The developer accepts zero liability for cosmic misunderstandings. 🪐",
   },
   sr: {
     "nav.home": "Početna",
@@ -170,6 +172,8 @@ const DICT = {
     "chart.tab.love": "Ljubav i Odnosi",
     "chart.tab.work": "Posao i Novac",
     "chart.tab.health": "Zdravlje i Vitalnost",
+    "disclaimer.title": "Kosmičko Upozorenje (Pročitajte Pre Nego Što Okrivite Zvezde)",
+    "disclaimer.body": "Ovo je <strong>eksperimentalni hobi projekat</strong> isključivo za zabavu. Planetama je svejedno za vaš portfolio, vašeg bivšeg ili sastanak u utorak.<br><br>NEMOJTE: prodavati kuću jer je Jupiter tako rekao, razvoditi se zbog Saturnovog tranzita, davati otkaz jer je Merkur retrogradan (opet), samodijagnostikovati se na osnovu 6. kuće, niti donositi životne odluke na osnovu onoga što vam je sajt rekao.<br><br>NEMOJTE povrediti sebe, druge, kućne ljubimce, biljke ili kreditni rejting na osnovu ičega što ste ovde pročitali. Ako prolazite kroz težak period, razgovarajte sa pravim čovekom — ne sa tabelom tranzita.<br><br><strong>Astrologija je zabavna. Za pravi život su potrebni pravi saveti.</strong> Razvijač ne prihvata nikakvu odgovornost za kosmičke nesporazume. 🪐",
   },
   de: {
     "nav.home": "Startseite",
@@ -256,6 +260,8 @@ const DICT = {
     "chart.tab.love": "Liebe & Beziehungen",
     "chart.tab.work": "Arbeit & Geld",
     "chart.tab.health": "Gesundheit & Vitalitat",
+    "disclaimer.title": "Kosmischer Haftungsausschluss (Bitte lesen, bevor Sie die Sterne beschuldigen)",
+    "disclaimer.body": "Dies ist ein <strong>experimentelles Hobbyprojekt</strong> nur zur Unterhaltung. Den Planeten ist Ihr Aktienportfolio, Ihr Ex oder Ihr Dienstagstermin egal.<br><br>NICHT: Ihr Haus verkaufen, weil Jupiter es gesagt hat, sich wegen eines Saturn-Transits scheiden lassen, Ihren Job kundigen, weil Merkur rucklaufig ist (schon wieder), sich aufgrund des 6. Hauses selbst diagnostizieren oder lebensverandernde Entscheidungen aufgrund einer Website treffen.<br><br>Verletzen Sie NICHT sich selbst, andere, Ihre Haustiere, Ihre Pflanzen oder Ihre Kreditwurdigkeit aufgrund von irgendetwas, das Sie hier gelesen haben. Wenn Sie eine schwere Zeit durchmachen, sprechen Sie mit einem echten Menschen — nicht mit einer Transit-Tabelle.<br><br><strong>Astrologie macht Spass. Das echte Leben braucht echte Ratschlage.</strong> Der Entwickler ubernimmt keinerlei Haftung fur kosmische Missverstandnisse. 🪐",
   },
 };
 
@@ -277,5 +283,8 @@ export function setLang(lang) {
 export function updatePageStrings() {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    el.innerHTML = t(el.dataset.i18nHtml);
   });
 }
