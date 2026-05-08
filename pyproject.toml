@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "natal-chart"
@@ -28,6 +28,9 @@ dev = [
     "ruff>=0.5",
     "mypy>=1.10",
 ]
+
+[tool.setuptools.packages.find]
+include = ["backend*"]
 
 [tool.ruff]
 line-length = 160

@@ -13,6 +13,7 @@ export function renderSettings(container) {
         <select id="s-lang">
           <option value="en" ${getLang() === "en" ? "selected" : ""}>English</option>
           <option value="sr" ${getLang() === "sr" ? "selected" : ""}>Srpski</option>
+          <option value="de" ${getLang() === "de" ? "selected" : ""}>Deutsch</option>
         </select>
       </div>
 

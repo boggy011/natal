@@ -49,3 +49,10 @@ export function getProfile(id) {
 export function deleteProfile(id) {
   return request(`/profiles/${id}`, { method: "DELETE" });
 }
+
+export function interpretChart(chart, lang = "en") {
+  return request(`/chart/interpret?lang=${encodeURIComponent(lang)}`, {
+    method: "POST",
+    body: JSON.stringify(chart),
+  });
+}

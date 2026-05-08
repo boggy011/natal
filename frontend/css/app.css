@@ -414,3 +414,44 @@ body {
 .checkbox-group input[type="checkbox"] {
   accent-color: var(--accent);
 }
+
+/* Life readings */
+.reading-card {
+  max-width: 100%;
+}
+
+.reading-section {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  background: rgba(124, 111, 224, 0.04);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.reading-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.reading-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--accent-light);
+}
+
+.reading-placement {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+}
+
+.reading-text {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text);
+  margin: 0;
+}

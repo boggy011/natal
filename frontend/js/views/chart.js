@@ -1,8 +1,8 @@
-import { t } from "../i18n.js";
+import { t, getLang } from "../i18n.js";
 import { getChart } from "../store.js";
 import { renderWheel } from "../components/chart-wheel.js";
 import { SIGN_GLYPHS, PLANET_GLYPHS, ASPECT_SYMBOLS, formatDegree, formatSpeed } from "../lib/astro-utils.js";
-import { computeChart } from "../api.js";
+import { computeChart, interpretChart } from "../api.js";
 import { saveChart } from "../store.js";
 
 export function renderChartView(container, id) {
@@ -51,6 +51,18 @@ export function renderChartView(container, id) {
         </div>
       </div>
     </div>
+
+    <div class="card reading-card" style="margin-top:1.5rem">
+      <h3 style="margin-bottom:1rem">${t("chart.reading")}</h3>
+      <div class="tabs" id="reading-tabs">
+        <span class="tab active" data-topic="love">${t("chart.tab.love")}</span>
+        <span class="tab" data-topic="work">${t("chart.tab.work")}</span>
+        <span class="tab" data-topic="health">${t("chart.tab.health")}</span>
+      </div>
+      <div id="reading-body">
+        <div class="loading">${t("chart.reading_loading")}</div>
+      </div>
+    </div>
   `;
 
   const svg = document.getElementById("chart-wheel");
@@ -80,6 +92,50 @@ export function renderChartView(container, id) {
       console.error("Failed to recompute chart:", err);
     }
   });
+
+  loadReadings(chart);
+}
+
+async function loadReadings(chart) {
+  const body = document.getElementById("reading-body");
+  const tabs = document.getElementById("reading-tabs");
+  if (!body || !tabs) return;
+
+  try {
+    const readings = await interpretChart(chart, getLang());
+    let activeTopic = "love";
+
+    function renderTopic(topic) {
+      const data = readings[topic];
+      if (!data) {
+        body.innerHTML = `<p class="text-muted">${t("chart.reading_error")}</p>`;
+        return;
+      }
+      body.innerHTML = data.sections.map(s => `
+        <div class="reading-section">
+          <div class="reading-heading">
+            <span class="reading-label">${s.heading}</span>
+            <span class="reading-placement">${SIGN_GLYPHS[s.sign] || ""} ${t("sign." + s.sign)}</span>
+          </div>
+          <p class="reading-text">${s.text}</p>
+        </div>
+      `).join("");
+    }
+
+    renderTopic(activeTopic);
+
+    tabs.addEventListener("click", (e) => {
+      const tab = e.target.closest(".tab");
+      if (!tab) return;
+      tabs.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      activeTopic = tab.dataset.topic;
+      renderTopic(activeTopic);
+    });
+  } catch (err) {
+    console.error("Failed to load readings:", err);
+    body.innerHTML = `<p style="color:var(--text-muted)">${t("chart.reading_error")}</p>`;
+  }
 }
 
 function anglesTable(chart) {
