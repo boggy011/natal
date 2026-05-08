@@ -31,6 +31,22 @@ export function renderSettings(container) {
     </div>
 
     <div class="card" style="margin-top:1rem">
+      <h4 style="margin-bottom:0.75rem">${t("settings.ai_title")}</h4>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem">${t("settings.ai_desc")}</p>
+      <div class="form-group">
+        <label>${t("settings.ai_key")}</label>
+        <input type="password" id="s-gemini-key" value="${settings.gemini_api_key || ""}" placeholder="AIzaSy...">
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <button class="btn btn-sm" id="btn-save-key">${t("settings.ai_save")}</button>
+        <span id="key-status" style="font-size:0.82rem;color:var(--teal)"></span>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem">
+        ${t("settings.ai_hint")}
+      </p>
+    </div>
+
+    <div class="card" style="margin-top:1rem">
       <button class="btn btn-danger" id="btn-reset">${t("settings.reset")}</button>
     </div>
   `;
@@ -43,6 +59,14 @@ export function renderSettings(container) {
 
   document.getElementById("s-house").addEventListener("change", (e) => {
     saveSetting("house_system", e.target.value);
+  });
+
+  document.getElementById("btn-save-key").addEventListener("click", () => {
+    const key = document.getElementById("s-gemini-key").value.trim();
+    saveSetting("gemini_api_key", key);
+    const status = document.getElementById("key-status");
+    status.textContent = key ? "Saved!" : "Cleared";
+    setTimeout(() => { status.textContent = ""; }, 2000);
   });
 
   document.getElementById("btn-reset").addEventListener("click", () => {

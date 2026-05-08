@@ -2,7 +2,7 @@ import { t, getLang } from "../i18n.js";
 import { getChart } from "../store.js";
 import { renderWheel } from "../components/chart-wheel.js";
 import { SIGN_GLYPHS, PLANET_GLYPHS, ASPECT_SYMBOLS, formatDegree, formatSpeed } from "../lib/astro-utils.js";
-import { computeChart, interpretChart } from "../api.js";
+import { computeChart, interpretChart, interpretChartAI } from "../api.js";
 import { saveChart } from "../store.js";
 
 export function renderChartView(container, id) {
@@ -119,7 +119,14 @@ async function loadReadings(chart) {
           </div>
           <p class="reading-text">${s.text}</p>
         </div>
-      `).join("");
+      `).join("") + `
+        <button class="btn btn-primary ai-deep-btn" id="btn-ai-deep">AI Deep Reading</button>
+        <div id="ai-deep-result"></div>
+      `;
+
+      document.getElementById("btn-ai-deep").addEventListener("click", () => {
+        loadAIDeep(chart, activeTopic);
+      });
     }
 
     renderTopic(activeTopic);
@@ -135,6 +142,34 @@ async function loadReadings(chart) {
   } catch (err) {
     console.error("Failed to load readings:", err);
     body.innerHTML = `<p style="color:var(--text-muted)">${t("chart.reading_error")}</p>`;
+  }
+}
+
+async function loadAIDeep(chart, topic) {
+  const result = document.getElementById("ai-deep-result");
+  const btn = document.getElementById("btn-ai-deep");
+  if (!result || !btn) return;
+
+  btn.disabled = true;
+  btn.textContent = "Consulting the stars...";
+  result.innerHTML = `<div class="ai-loading"><span class="ai-spinner"></span> AI is reading your chart...</div>`;
+
+  try {
+    const text = await interpretChartAI(chart, topic, getLang());
+    result.innerHTML = text
+      .split(/\n\n+/)
+      .filter(p => p.trim())
+      .map(p => `<p class="ai-paragraph">${p.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`)
+      .join("");
+  } catch (e) {
+    if (e.message === "NO_KEY") {
+      result.innerHTML = `<p class="ai-nokey">${t("settings.ai_nokey")} <a href="#/settings" style="color:var(--accent-light)">Settings</a></p>`;
+    } else {
+      result.innerHTML = `<p class="ai-error">The cosmic connection is down. Try again in a moment. (${e.message})</p>`;
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "AI Deep Reading";
   }
 }
 

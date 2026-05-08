@@ -1,10 +1,10 @@
 /**
  * API module — all computation is local (no backend required).
- * Uses core/calc.js for chart computation and core/readings.js for interpretations.
  */
 
-import { computeChart as calcChart } from "./core/calc.js";
+import { computeChart as calcChart, scanTransits as calcTransits } from "./core/calc.js";
 import { generateLifeReading } from "./core/readings.js";
+export { interpretTransit, interpretChartAI } from "./core/ai.js";
 
 export function computeChart(birth, config = {}) {
   return Promise.resolve(calcChart(birth, config));
@@ -12,6 +12,10 @@ export function computeChart(birth, config = {}) {
 
 export function interpretChart(chart, lang = "en") {
   return Promise.resolve(generateLifeReading(chart, lang));
+}
+
+export function scanTransits(chart, start, end, filters = {}) {
+  return Promise.resolve(calcTransits(chart, start, end, filters));
 }
 
 export async function geocode(query) {
@@ -33,29 +37,9 @@ export async function geocode(query) {
       timezone = tzData.timeZone || "UTC";
     }
   } catch {
-    timezone = guessTimezone(lon);
+    const offset = Math.round(lon / 15);
+    timezone = `Etc/GMT${offset <= 0 ? "+" : "-"}${Math.abs(offset)}`;
   }
 
-  return {
-    display_name: loc.display_name,
-    latitude: lat,
-    longitude: lon,
-    timezone,
-  };
-}
-
-function guessTimezone(lon) {
-  const offset = Math.round(lon / 15);
-  const abs = Math.abs(offset);
-  const sign = offset >= 0 ? "+" : "-";
-  return `Etc/GMT${offset <= 0 ? "+" : "-"}${abs}`;
-}
-
-export function listProfiles() { return Promise.resolve([]); }
-export function createProfile() { return Promise.resolve(null); }
-export function getProfile() { return Promise.resolve(null); }
-export function deleteProfile() { return Promise.resolve(null); }
-
-export function scanTransits(natal, start, end, filters = {}) {
-  return Promise.resolve({ natal, range_start: start, range_end: end, hits: [] });
+  return { display_name: loc.display_name, latitude: lat, longitude: lon, timezone };
 }

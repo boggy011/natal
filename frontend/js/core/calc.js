@@ -351,3 +351,85 @@ export function computeChart(birth, config = {}) {
     obliquity: eps,
   };
 }
+
+// ── Transit scanner ────────────────────────────────────────────────────
+const TRANSIT_ORBS = {
+  conjunction: 1.5, opposition: 1.5, square: 1.5,
+  trine: 1.5, sextile: 1.0, quincunx: 1.0, semisextile: 0.8,
+};
+
+export function scanTransits(chart, startDate, endDate, filters = {}) {
+  const ast = A();
+  const transitPlanets = filters.transit_planets || ["Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"];
+  const natalPoints = filters.natal_points || chart.planets.map(p => p.name).concat(["ASC","MC"]);
+  const aspectNames = filters.aspects || ["conjunction","opposition","square","trine","sextile"];
+
+  const natalPos = {};
+  for (const p of chart.planets) natalPos[p.name] = p.longitude;
+  natalPos["ASC"] = chart.houses.ascendant;
+  natalPos["MC"] = chart.houses.midheaven;
+
+  const start = new Date(startDate + "T12:00:00Z");
+  const end = new Date(endDate + "T12:00:00Z");
+  const rawHits = [];
+
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const time = ast.MakeTime(d);
+    for (const tp of transitPlanets) {
+      if (!PLANET_BODIES.includes(tp)) continue;
+      const tLon = getPlanetEcliptic(tp, time).lon;
+      const tSpeed = getPlanetSpeed(tp, time);
+      for (const np of natalPoints) {
+        const nLon = natalPos[np];
+        if (nLon === undefined) continue;
+        const ang = angularDist(tLon, nLon);
+        for (const aspName of aspectNames) {
+          const exact = ASPECT_DEFS[aspName]?.angle;
+          if (exact === undefined) continue;
+          const maxOrb = TRANSIT_ORBS[aspName] || 1.5;
+          const orb = Math.abs(ang - exact);
+          if (orb <= maxOrb) {
+            rawHits.push({
+              date: d.toISOString(),
+              transit_planet: tp,
+              natal_point: np,
+              aspect: aspName,
+              orb_at_exact: Math.round(orb * 1000) / 1000,
+              transit_lon: tLon,
+              natal_lon: nLon,
+              is_retrograde: tSpeed < 0,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  const grouped = {};
+  for (const h of rawHits) {
+    const key = `${h.transit_planet}-${h.aspect}-${h.natal_point}`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(h);
+  }
+
+  const hits = [];
+  for (const arr of Object.values(grouped)) {
+    arr.sort((a, b) => new Date(a.date) - new Date(b.date));
+    let best = arr[0];
+    let windowStart = new Date(arr[0].date);
+    for (let i = 1; i < arr.length; i++) {
+      const dt = new Date(arr[i].date);
+      if (dt - windowStart < 14 * 86400000) {
+        if (arr[i].orb_at_exact < best.orb_at_exact) best = arr[i];
+      } else {
+        hits.push(best);
+        best = arr[i];
+        windowStart = dt;
+      }
+    }
+    hits.push(best);
+  }
+
+  hits.sort((a, b) => new Date(a.date) - new Date(b.date));
+  return { natal: chart, range_start: startDate, range_end: endDate, hits };
+}

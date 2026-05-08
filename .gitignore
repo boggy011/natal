@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.env
+frontend/.env
+frontend/js/config.js
+*.db
+.DS_Store
