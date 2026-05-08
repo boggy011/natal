@@ -5,6 +5,8 @@ import { renderSettings } from "./views/settings.js";
 import { getLang, setLang, updatePageStrings } from "./i18n.js";
 
 const app = document.getElementById("app");
+const LANG_CYCLE = ["en", "sr", "de"];
+const LANG_LABELS = { en: "EN", sr: "SR", de: "DE" };
 
 function route() {
   const hash = window.location.hash || "#/";
@@ -12,6 +14,7 @@ function route() {
 
   updatePageStrings();
   updateActiveNav(hash);
+  updateLangButton();
 
   if (parts[0] === "" || parts[0] === undefined) {
     renderHome(app);
@@ -34,9 +37,16 @@ function updateActiveNav(hash) {
   });
 }
 
+function updateLangButton() {
+  const btn = document.getElementById("lang-toggle");
+  if (btn) btn.textContent = LANG_LABELS[getLang()] || "EN";
+}
+
 document.getElementById("lang-toggle").addEventListener("click", () => {
-  const newLang = getLang() === "en" ? "sr" : "en";
-  setLang(newLang);
+  const cur = getLang();
+  const idx = LANG_CYCLE.indexOf(cur);
+  const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
+  setLang(next);
   route();
 });
 
