@@ -106,7 +106,7 @@ export function renderHome(container) {
     if (key) {
       saveSetting("gemini_api_key", key);
       const status = document.getElementById("home-key-status");
-      status.textContent = "Saved! AI readings are now active.";
+      status.textContent = t("home.ai_saved");
       setTimeout(() => { renderHome(container); }, 1500);
     }
   });
@@ -142,7 +142,7 @@ function profileCard(id, chart) {
       <div class="actions">
         <button class="btn btn-sm btn-danger btn-delete" data-id="${id}">✕</button>
       </div>
-      <h3>${b.name || "Unnamed"}</h3>
+      <h3>${b.name || t("home.unnamed")}</h3>
       <div class="meta">${dateStr} ${timeStr}</div>
       <div class="meta">${b.place_name || ""}</div>
       <div class="meta" style="margin-top:0.25rem">${sunSign}</div>
@@ -155,7 +155,7 @@ async function handleCompute() {
   errEl.textContent = "";
 
   if (!selectedPlace) {
-    errEl.textContent = "Please select a place from the search results.";
+    errEl.textContent = t("home.place_error");
     return;
   }
 
@@ -180,7 +180,7 @@ async function handleCompute() {
 
   const btn = document.getElementById("btn-compute");
   btn.disabled = true;
-  btn.textContent = "Computing...";
+  btn.textContent = t("home.computing");
 
   try {
     const chart = await computeChart(birth, config);

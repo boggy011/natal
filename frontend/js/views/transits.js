@@ -11,7 +11,7 @@ let currentChart = null;
 export function renderTransitsView(container, chartId) {
   const chart = getChart(chartId);
   if (!chart) {
-    container.innerHTML = `<div class="empty-state"><p>Chart not found.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><p>${t("chart.not_found")}</p></div>`;
     return;
   }
   currentChart = chart;
@@ -63,7 +63,7 @@ export function renderTransitsView(container, chartId) {
     </div>
 
     <div id="transit-results">
-      <div class="empty-state"><p>Configure filters and press Scan.</p></div>
+      <div class="empty-state"><p>${t("transits.configure")}</p></div>
     </div>
 
     <div id="ai-output" class="ai-output-box" style="display:none">
@@ -94,7 +94,7 @@ async function handleScan(chart) {
   const resultsEl = document.getElementById("transit-results");
   const btn = document.getElementById("btn-scan");
   btn.disabled = true;
-  btn.textContent = "Scanning...";
+  btn.textContent = t("transits.scanning");
   resultsEl.innerHTML = `<div class="loading"><p>Computing transit positions...</p></div>`;
 
   const start = document.getElementById("t-start").value;
@@ -143,7 +143,7 @@ function renderScrollableTable(container, hits, chart) {
         <tbody></tbody>
       </table>
     </div>
-    <p class="transit-hint">Click a row to get AI interpretation</p>
+    <p class="transit-hint">${t("transits.click_hint")}</p>
   `;
 
   const tbody = container.querySelector("tbody");
@@ -184,7 +184,7 @@ async function loadAIInterpretation(hit, chart) {
 
   box.style.display = "block";
   title.textContent = `${transitLabel} — ${dateLabel}`;
-  body.innerHTML = `<div class="ai-loading"><span class="ai-spinner"></span> AI is thinking about the stars...</div>`;
+  body.innerHTML = `<div class="ai-loading"><span class="ai-spinner"></span> ${t("transits.ai_thinking")}</div>`;
   box.scrollIntoView({ behavior: "smooth", block: "start" });
 
   try {
@@ -194,7 +194,7 @@ async function loadAIInterpretation(hit, chart) {
     if (e.message === "NO_KEY") {
       body.innerHTML = `<p class="ai-nokey">${t("settings.ai_nokey")} <a href="#/settings" style="color:var(--accent-light)">Settings</a></p>`;
     } else {
-      body.innerHTML = `<p class="ai-error">Could not reach the AI oracle. The stars are shy today. (${e.message})</p>`;
+      body.innerHTML = `<p class="ai-error">${t("transits.ai_error")} (${e.message})</p>`;
     }
   }
 }

@@ -8,7 +8,7 @@ import { saveChart } from "../store.js";
 export function renderChartView(container, id) {
   const chart = getChart(id);
   if (!chart) {
-    container.innerHTML = `<div class="empty-state"><p>Chart not found.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><p>${t("chart.not_found")}</p></div>`;
     return;
   }
 
@@ -120,7 +120,7 @@ async function loadReadings(chart) {
           <p class="reading-text">${s.text}</p>
         </div>
       `).join("") + `
-        <button class="btn btn-primary ai-deep-btn" id="btn-ai-deep">AI Deep Reading</button>
+        <button class="btn btn-primary ai-deep-btn" id="btn-ai-deep">${t("chart.ai_btn")}</button>
         <div id="ai-deep-result"></div>
       `;
 
@@ -151,8 +151,8 @@ async function loadAIDeep(chart, topic) {
   if (!result || !btn) return;
 
   btn.disabled = true;
-  btn.textContent = "Consulting the stars...";
-  result.innerHTML = `<div class="ai-loading"><span class="ai-spinner"></span> AI is reading your chart...</div>`;
+  btn.textContent = t("chart.ai_loading");
+  result.innerHTML = `<div class="ai-loading"><span class="ai-spinner"></span> ${t("chart.ai_thinking")}</div>`;
 
   try {
     const text = await interpretChartAI(chart, topic, getLang());
@@ -165,11 +165,11 @@ async function loadAIDeep(chart, topic) {
     if (e.message === "NO_KEY") {
       result.innerHTML = `<p class="ai-nokey">${t("settings.ai_nokey")} <a href="#/settings" style="color:var(--accent-light)">Settings</a></p>`;
     } else {
-      result.innerHTML = `<p class="ai-error">The cosmic connection is down. Try again in a moment. (${e.message})</p>`;
+      result.innerHTML = `<p class="ai-error">${t("chart.ai_error")} (${e.message})</p>`;
     }
   } finally {
     btn.disabled = false;
-    btn.textContent = "AI Deep Reading";
+    btn.textContent = "${t("chart.ai_btn")}";
   }
 }
 
@@ -263,7 +263,7 @@ function setupAspectFilter(chart) {
 
   const allChip = document.createElement("span");
   allChip.className = "chip active";
-  allChip.textContent = "All";
+  allChip.textContent = t("chart.all");
   allChip.addEventListener("click", () => {
     filterEl.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
     allChip.classList.add("active");

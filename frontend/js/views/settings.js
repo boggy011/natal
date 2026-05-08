@@ -65,7 +65,7 @@ export function renderSettings(container) {
     const key = document.getElementById("s-gemini-key").value.trim();
     saveSetting("gemini_api_key", key);
     const status = document.getElementById("key-status");
-    status.textContent = key ? "Saved!" : "Cleared";
+    status.textContent = key ? t("settings.saved") : t("settings.cleared");
     setTimeout(() => { status.textContent = ""; }, 2000);
   });
 

@@ -1,4 +1,5 @@
 import { geocode } from "../api.js";
+import { t } from "../i18n.js";
 
 export function initPlaceSearch(inputEl, onSelect) {
   const wrapper = inputEl.parentElement;
@@ -36,7 +37,7 @@ export function initPlaceSearch(inputEl, onSelect) {
         dropdown.appendChild(item);
         dropdown.style.display = "block";
       } catch {
-        dropdown.innerHTML = `<div class="autocomplete-item" style="color: var(--text-muted)">No results found</div>`;
+        dropdown.innerHTML = `<div class="autocomplete-item" style="color: var(--text-muted)">${t("geocode.no_results")}</div>`;
         dropdown.style.display = "block";
       }
     }, 600);
